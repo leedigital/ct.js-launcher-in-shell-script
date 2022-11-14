@@ -445,7 +445,7 @@ buildVersionFile() {
 
 # @param $1 - json from https://api.github.com/repos/ct-js/ct-js/releases/latest
 jsonHandler() {
-   local found strKey
+   local found strKey version
    echo "parsing json ..."
    declare -A jsonArray=(
       [tag_name]=""
@@ -460,6 +460,20 @@ jsonHandler() {
       line=$(echo "$line" | sed -uE 's/\s+//g')
       if echo "$line" | grep ^'"tag_name"' >/dev/null; then
          jsonArray[tag_name]=$(echo "$line" | cut -d: -f2)
+         if [[ -e $versionFile ]]; then
+            while read -r l; do
+               if echo "$l" | grep '"tag_name"' >/dev/null; then
+                  version=$(echo "$l" | cut -d: -f2)
+                  if [[ $version =~ ${jsonArray[tag_name]} ]]; then
+                     echo -n "$GREEN_COLOR${BOLD_TEXT}"
+                     echo -n "It's already latest version"
+                     echo "$RESET_ALL_ATTRIBUTES"
+                     return 0
+                  fi
+               fi
+            done <"$versionFile"
+            echo
+         fi
       elif echo "$line" | grep ^'"assets"' >/dev/null; then
          found=true
          continue
