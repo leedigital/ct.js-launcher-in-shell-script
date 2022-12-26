@@ -329,7 +329,7 @@ extractFiles() {
    echo ""$'\b'"Extracting files ..."
    if cat <"$filePath" | stdbuf -o0 bsdtar -x -C "$tmpFolder"; then
       echo ""$'\b'"Adjusting work folder ..."
-      if [[ -f "$tmpFolder/$os_arch" ]]; then
+      if [[ -d "$tmpFolder/$os_arch" ]]; then
          mv "$tmpFolder/$os_arch" "$cacheFolder"
       else
          mv "$tmpFolder" "$workDir"
